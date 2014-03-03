@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Todo List</string>
+    <string name="app_description">Lists the tasks one needs to do</string>
+    
+    <string name="action_add_task">Add</string>
+    <string name="action_remove_task">Delete Item</string>
+    
+    <string name="edtNewItem_default_text"></string>
+    <string name="hint_add_new_task">What do you want to add?</string>
+    <string name="error_empty_task">This cannot be empty</string>
+
+</resources>
