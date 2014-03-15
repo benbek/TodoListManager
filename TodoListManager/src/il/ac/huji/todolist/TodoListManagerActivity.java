@@ -1,7 +1,11 @@
 package il.ac.huji.todolist;
 
+import java.util.Date;
+
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -9,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 /***
@@ -17,13 +20,10 @@ import android.widget.ListView;
  *
  */
 public class TodoListManagerActivity extends Activity {
+    static final String INTENT_DIAL_PREFIX = "tel:";
     
     // An array adapter to bind the ArrayList to the ListView
     private TodoListAdapter listAdapter = null;
-    
-    private String getResourceString(int id) {
-        return this.getResources().getString(id);
-    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class TodoListManagerActivity extends Activity {
         setContentView(R.layout.activity_todo_list_manager);
         
         listAdapter = new TodoListAdapter(getApplicationContext(), 
-                android.R.layout.simple_list_item_1);
+                R.layout.todo_list_item_layout, R.id.txtTodoTitle);
 
         // Bind the array adapter to the ListView
         final ListView todoListView = (ListView)findViewById(R.id.lstTodoItems);
@@ -59,8 +59,17 @@ public class TodoListManagerActivity extends Activity {
             AdapterView.AdapterContextMenuInfo info = 
                 (AdapterView.AdapterContextMenuInfo)menuInfo;
             
-            menu.setHeaderTitle(listAdapter.getItem(info.position));
+            TodoItem item = listAdapter.getItem(info.position);
+            
+            menu.setHeaderTitle(item.title);
             inflater.inflate(R.menu.todo_list_item_menu, menu);
+            
+            if (getDialString(item) != null) {
+                menu.findItem(R.id.menuItemCall).setTitle(item.title);
+                menu.findItem(R.id.menuItemCall).setVisible(true);
+            } else {
+                menu.findItem(R.id.menuItemCall).setVisible(false);
+            }
       }
     }
     
@@ -73,22 +82,60 @@ public class TodoListManagerActivity extends Activity {
         switch(item.getItemId()) {
             case R.id.menuItemDelete:
                 listAdapter.remove(listAdapter.getItem(info.position));
-            default:
-                return super.onContextItemSelected(item);
+                return true;
+            case R.id.menuItemCall:
+                TodoItem selection = listAdapter.getItem(info.position);
+                Intent dial = new Intent(Intent.ACTION_DIAL,
+                    Uri.parse(getDialString(selection)));
+                startActivity(dial);
+                return true;
           }
+        
+        return super.onContextItemSelected(item);
     }
 
     /** Called when the user touches the "add" menu item */
-    public void addTask(MenuItem item) {
-        EditText newItem = (EditText)findViewById(R.id.edtNewItem);
+    public void addTaskMenuItem(MenuItem item) {
+        Intent intent = new Intent(this, AddNewTodoItemActivity.class);
+        startActivityForResult(intent, CommonActivities.ADD_TODO_CODE);
+    }
+
+    protected void addTask(String title, Date dueDate) {
+        TodoItem item = new TodoItem();
         
-        // Check input
-        if(newItem.getText().toString().isEmpty()) {
-            newItem.setError(getResourceString(R.string.error_empty_task));
-            return;
+        item.title = title;
+        item.dueDate = dueDate;
+        
+        addTask(item);
+    }
+    
+    protected void addTask(TodoItem item) {
+        listAdapter.add(item);
+    }
+    
+    protected String getDialString(TodoItem item) {
+        if (item.title.startsWith(this.getResources().getString(
+                R.string.item_prefix_call))) {
+            return INTENT_DIAL_PREFIX.concat(item.title.substring(
+                    this.getResources().getString(R.string.item_prefix_call).
+                    length()));
+        } else {
+            return null;
         }
-        
-        listAdapter.add(newItem.getText().toString());
-        newItem.setText(R.string.edtNewItem_default_text);
+    }
+    
+    @Override
+    protected void onActivityResult(int reqCode, int resCode, Intent data) {
+        switch (reqCode) {
+        case CommonActivities.ADD_TODO_CODE:
+            if (resCode == RESULT_OK) {
+                String itemTitle = data.getStringExtra(
+                        CommonActivities.EXTRA_DATA_TITLE);
+                Date itemDueDate = (Date)data.getSerializableExtra(
+                        CommonActivities.EXTRA_DATA_DUE_DATE);
+                
+                addTask(itemTitle, itemDueDate);
+            }
+        }
     }
 }

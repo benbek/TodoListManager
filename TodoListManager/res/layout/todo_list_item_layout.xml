@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:layout_height="?android:attr/listPreferredItemHeight"
+ android:layout_width="fill_parent"
+ android:orientation="horizontal"
+ android:background="#ffffff"
+>
+
+	 <TextView android:id="@+id/txtTodoTitle"
+		 android:layout_height="fill_parent"
+		 android:layout_width="wrap_content"
+		 android:layout_margin="5dip"
+		 android:layout_weight="3"
+		 android:textAppearance="?android:attr/textAppearanceListItem"
+		 android:gravity="center_vertical"
+		 android:singleLine="true"
+	 />
+	
+	 <TextView android:id="@+id/txtTodoDueDate"
+		 android:layout_height="fill_parent"
+		 android:layout_width="wrap_content"
+		 android:layout_margin="5dip"
+		 android:layout_weight="1"
+		 android:gravity="right|center_vertical"
+		 android:singleLine="true"
+	 />
+
+ </LinearLayout>

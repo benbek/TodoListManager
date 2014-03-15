@@ -1,5 +1,6 @@
 <resources>
     <drawable name="transparent">#00ffffff</drawable>
-    <drawable name="alternate_color1">#ffff0000</drawable>
+    <drawable name="alternate_color1">#ff00ff00</drawable>
     <drawable name="alternate_color2">#ff0000ff</drawable>
+    <drawable name="warning_color">#ffff0000</drawable>
 </resources>
