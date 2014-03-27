@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
  * Represents an item in the Todo list.
  */
 public class TodoItem {
+    public int id;
     public String title;
     public Date dueDate;
     

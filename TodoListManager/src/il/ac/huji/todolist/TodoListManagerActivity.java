@@ -1,7 +1,6 @@
 package il.ac.huji.todolist;
 
 import java.util.Date;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -25,14 +24,20 @@ public class TodoListManagerActivity extends Activity {
     // An array adapter to bind the ArrayList to the ListView
     private TodoListAdapter listAdapter = null;
     
+    // A database and object manager
+    private DBHelper dbHelper;
+       
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list_manager);
         
+        dbHelper = new DBHelper(getApplicationContext());
+        
         listAdapter = new TodoListAdapter(getApplicationContext(), 
                 R.layout.todo_list_item_layout, R.id.txtTodoTitle);
-
+        listAdapter.addAll(dbHelper.getTodoItems());
+        
         // Bind the array adapter to the ListView
         final ListView todoListView = (ListView)findViewById(R.id.lstTodoItems);
         todoListView.setAdapter(listAdapter);
@@ -79,12 +84,14 @@ public class TodoListManagerActivity extends Activity {
         AdapterView.AdapterContextMenuInfo info = 
             (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
         
+        TodoItem selection = listAdapter.getItem(info.position);
+        
         switch(item.getItemId()) {
             case R.id.menuItemDelete:
-                listAdapter.remove(listAdapter.getItem(info.position));
+                dbHelper.deleteTodoItem(selection.id);
+                listAdapter.remove(selection);
                 return true;
             case R.id.menuItemCall:
-                TodoItem selection = listAdapter.getItem(info.position);
                 Intent dial = new Intent(Intent.ACTION_DIAL,
                     Uri.parse(getDialString(selection)));
                 startActivity(dial);
@@ -110,6 +117,7 @@ public class TodoListManagerActivity extends Activity {
     }
     
     protected void addTask(TodoItem item) {
+        dbHelper.addTodoItem(item);        
         listAdapter.add(item);
     }
     
