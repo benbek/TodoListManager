@@ -17,4 +17,5 @@ public class CommonActivities {
     static final String PARSE_ITEM_ID_KEY = "rowId";
     static final String PARSE_ITEM_TITLE_KEY = EXTRA_DATA_TITLE;
     static final String PARSE_ITEM_DUE_DATE_KEY = EXTRA_DATA_DUE_DATE;
+    static final String PARSE_ITEM_USER_KEY = "user";
 }

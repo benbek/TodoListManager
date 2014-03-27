@@ -6,9 +6,11 @@ import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -68,6 +70,9 @@ public class DBHelper extends SQLiteOpenHelper {
         parseItem.put(CommonActivities.PARSE_ITEM_ID_KEY, item.id);
         parseItem.put(CommonActivities.PARSE_ITEM_TITLE_KEY, item.title);
         parseItem.put(CommonActivities.PARSE_ITEM_DUE_DATE_KEY, itemDueDate);
+        parseItem.put(CommonActivities.PARSE_ITEM_USER_KEY, 
+                ParseUser.getCurrentUser());
+        parseItem.setACL(new ParseACL(ParseUser.getCurrentUser()));
         parseItem.saveInBackground();
     }
     
