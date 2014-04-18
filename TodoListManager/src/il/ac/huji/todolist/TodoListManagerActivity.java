@@ -26,6 +26,9 @@ public class TodoListManagerActivity extends Activity {
     
     // A database and object manager
     private DBHelper dbHelper;
+    
+    // An asynchronous task to load database items
+    private DBLoadTask dbLoadTask;
        
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,8 @@ public class TodoListManagerActivity extends Activity {
         
         listAdapter = new TodoListAdapter(getApplicationContext(), 
                 R.layout.todo_list_item_layout, R.id.txtTodoTitle);
-        listAdapter.addAll(dbHelper.getTodoItems());
+        dbLoadTask = new DBLoadTask(dbHelper, listAdapter);        
+        dbLoadTask.execute();
         
         // Bind the array adapter to the ListView
         final ListView todoListView = (ListView)findViewById(R.id.lstTodoItems);

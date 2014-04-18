@@ -12,6 +12,12 @@ public class TodoListApplication extends Application {
     public void onCreate() {
         super.onCreate();
         
+        //initializeParse();
+    }
+    
+    // Parse is not currently needed; This method is left for a future endeavor
+    @SuppressWarnings("unused")
+    private void initializeParse() {
         Parse.initialize(getApplicationContext(), 
                 "iLpEvdrWuye11ZDkRwvzKUS9i5iA5GTRQPzTLWY0", 
                 "xq0IwMFnV0xAehWuktDphdFjAHMT4KAXGm5oa2M6");

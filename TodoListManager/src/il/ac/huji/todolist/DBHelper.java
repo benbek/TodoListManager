@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+@SuppressWarnings("unused")
 public class DBHelper extends SQLiteOpenHelper {
 
     protected static final String dbName = "todo_db";
@@ -31,6 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, dbName, null, 1);
     }
     
+    // Parse is not currently needed; This method is left for a future endeavor
     private void clearAllParseObjects() { 
         ParseQuery<ParseObject> query = 
             ParseQuery.getQuery(CommonActivities.PARSE_OBJECT_NAME);
@@ -65,7 +67,8 @@ public class DBHelper extends SQLiteOpenHelper {
         
         item.id = (int)db.insert(tableName, null, taskValues);
         
-        ParseObject parseItem = 
+        // Parse is not needed
+        /* ParseObject parseItem = 
             new ParseObject(CommonActivities.PARSE_OBJECT_NAME);
         parseItem.put(CommonActivities.PARSE_ITEM_ID_KEY, item.id);
         parseItem.put(CommonActivities.PARSE_ITEM_TITLE_KEY, item.title);
@@ -73,10 +76,12 @@ public class DBHelper extends SQLiteOpenHelper {
         parseItem.put(CommonActivities.PARSE_ITEM_USER_KEY, 
                 ParseUser.getCurrentUser());
         parseItem.setACL(new ParseACL(ParseUser.getCurrentUser()));
-        parseItem.saveInBackground();
+        parseItem.saveInBackground();*/
     }
     
     boolean deleteTodoItem(Integer itemId) {
+        // Parse is not needed
+        /* 
         ParseQuery<ParseObject> query = 
             ParseQuery.getQuery(CommonActivities.PARSE_OBJECT_NAME);
         query.whereEqualTo(CommonActivities.PARSE_ITEM_ID_KEY, itemId);
@@ -88,7 +93,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     object.deleteInBackground();
                 }
             }
-        });
+        }); */
         
         SQLiteDatabase db = this.getWritableDatabase();
         return 0 < db.delete(tableName, colId + " = ?", 
@@ -96,29 +101,48 @@ public class DBHelper extends SQLiteOpenHelper {
     }
     
     List<TodoItem> getTodoItems() {
-        long itemDueDate;
         ArrayList<TodoItem> items = new ArrayList<TodoItem>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(tableName, new String[] { colId, colTitle,
-                colDue }, null, null, null, null, "1 asc");
+        Cursor cursor = fetchDbCursor();
         
         if (cursor.moveToFirst()) {
             do {
-                TodoItem item = new TodoItem();
-                item.id = cursor.getInt(0);
-                item.title = cursor.getString(1);
-                itemDueDate = cursor.getLong(2);
-                if (itemDueDate != CommonActivities.NULL_DUE_DATE_VALUE) {
-                    item.dueDate = new Date(itemDueDate);
-                } else {
-                    item.dueDate = null;
-                }
+                TodoItem item = fetchNextTodoItem(cursor);
                 
                 items.add(item);
             } while (cursor.moveToNext());
         }
         
         return items;
+    }
+
+    Cursor fetchDbCursor() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(tableName, new String[] { colId, colTitle,
+                colDue }, null, null, null, null, "1 asc");
+        
+        return cursor;
+    }
+
+    TodoItem fetchNextTodoItem(Cursor cursor) {
+        long itemDueDate;
+        TodoItem item = new TodoItem();
+        
+        if ((cursor.isBeforeFirst() && !cursor.moveToFirst()) || 
+                !cursor.moveToNext()) {
+            // No (more) items
+            return null;
+        }
+        
+        item.id = cursor.getInt(0);
+        item.title = cursor.getString(1);
+        itemDueDate = cursor.getLong(2);
+        if (itemDueDate != CommonActivities.NULL_DUE_DATE_VALUE) {
+            item.dueDate = new Date(itemDueDate);
+        } else {
+            item.dueDate = null;
+        }
+        
+        return item;
     }
     
     /***
@@ -135,7 +159,7 @@ public class DBHelper extends SQLiteOpenHelper {
         
         db.execSQL(createCommandText);
         
-        clearAllParseObjects();
+        //clearAllParseObjects();
     }
 
     /***
